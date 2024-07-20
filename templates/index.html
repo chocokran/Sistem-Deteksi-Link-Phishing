@@ -1,0 +1,180 @@
+<!doctype html>
+<html class="no-js" lang="zxx">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>LinkVerify | Deteksi Phishing</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='assets/img/favicon.ico') }}">
+
+    <!-- CSS here -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/owl.carousel.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/slicknav.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/flaticon.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/progressbar_barfiller.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/gijgo.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/animate.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/animated-headline.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/magnific-popup.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/fontawesome-all.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/themify-icons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/slick.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/nice-select.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/style.css') }}">
+    <style>
+        .domain-search-area {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .hero__caption .btn.radius-btn {
+            cursor: pointer;
+        }
+        .sticky-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            transition: background-color 0.3s ease;
+            background-color: rgba(45,10,49,255); /* Atur warna latar belakang yang diinginkan */
+        }
+        .result {
+            font-size: 1.5rem; /* Membuat hasil deteksi lebih besar */
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            flex-direction: column;
+        }
+        .result .icon {
+            font-size: 2rem; /* Membuat ikon lebih besar */
+            margin-right: 15px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <!-- Header Start -->
+        <div class="header-area header-transparent">
+            <div class="main-header">
+                <div class="header-bottom header-sticky">
+                    <div class="container-fluid">
+                        <div class="row align-items-center">
+                            <!-- Logo -->
+                            <div class="col-xl-2 col-lg-2">
+                                <div class="logo">
+                                    <a href="{{ url_for('home') }}"><img src="{{ url_for('static', filename='assets/img/logo/loder.png') }}" alt=""> LinkVerify</a>
+                                </div>
+                            </div>
+                            <div class="col-xl-10 col-lg-10">
+                                <div class="menu-wrapper d-flex align-items-center justify-content-end">
+                                    <!-- Main-menu -->
+                                    <div class="main-menu d-none d-lg-block">
+                                        <nav>
+                                            <ul id="navigation">
+                                                <li><a href="{{ url_for('home') }}">Home</a></li>
+                                            
+                                                {% if session.get('user_id') %}
+                                                    <li class="button-header margin-left"><a href="{{ url_for('dashboard') }}" class="btn">Dashboard</a></li>
+                                                    <li class="button-header"><a href="{{ url_for('logout') }}" class="btn3">Logout</a></li>
+                                                {% else %}
+                                                    <li class="button-header margin-left"><a href="{{ url_for('register') }}" class="btn">Sign Up</a></li>
+                                                    <li class="button-header"><a href="{{ url_for('login') }}" class="btn3">Sign In</a></li>
+                                                {% endif %}
+                                            </ul>
+                                        </nav>
+                                    </div>
+                                </div>
+                            </div> 
+                            <!-- Mobile Menu -->
+                            <div class="col-12">
+                                <div class="mobile_menu d-block d-lg-none"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Header End -->
+    </header>
+    <main>
+
+        <!-- Deteksi Phishing start -->
+        <div class="domain-search-area section-bg1 pt-5" id="check">
+           <div class="container pt-5">
+               <div class="row justify-content-center">
+                   <div class="col-xl-8 col-lg-10">
+                       <h2 class="text-center">Deteksi Phishing</h2>
+                       <p class="text-center">Periksa apakah URL yang Anda masukkan aman dari phishing.</p>
+                       <!--Hero form -->
+                       <form action="/detect" method="post" class="search-box">
+                           <div class="input-form">
+                               <input type="text" name="url" placeholder="Masukkan URL yang ingin Anda periksa" required>
+                               <!-- icon search -->
+                               <div class="search-form">
+                                   <button type="submit"><i class="ti-search"></i></button>
+                               </div>
+                               <!-- icon search -->
+                               <div class="world-form">
+                                   <i class="fas fa-globe"></i>
+                               </div>
+                           </div>
+                       </form>
+                       <!-- Domain List End -->
+
+                       {% if result %}
+                           <div class="result mt-3 {% if result == 'Terindikasi Website Phishing' %} alert alert-danger {% else %} alert alert-success {% endif %}">
+                               <span class="icon {% if result == 'Terindikasi Website Phishing' %} fas fa-times-circle {% else %} fas fa-check-circle {% endif %}"></span>
+                               <h1>Hasil Deteksi</h1>
+                               <h3>{{ result }}</h3>
+                           </div>
+                       {% endif %}
+                   </div>
+               </div>
+           </div>
+        </div>
+        <!-- Deteksi Phishing End -->
+    </main>
+        <!-- Scroll Up -->
+        <div id="back-top">
+            <a title="Go to Top" href="#"> <i class="fas fa-level-up-alt"></i></a>
+        </div>
+
+        <!-- JS here -->
+        <script src="{{ url_for('static', filename='assets/js/vendor/modernizr-3.5.0.min.js') }}"></script>
+        <!-- Jquery, Popper, Bootstrap -->
+        <script src="{{ url_for('static', filename='assets/js/vendor/jquery-1.12.4.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='assets/js/popper.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='assets/js/bootstrap.min.js') }}"></script>
+        <!-- Jquery Mobile Menu -->
+        <script src="{{ url_for('static', filename='assets/js/jquery.slicknav.min.js') }}"></script>
+        <!-- Jquery Slick , Owl-Carousel Plugins -->
+        <script src="{{ url_for('static', filename='assets/js/owl.carousel.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='assets/js/slick.min.js') }}"></script>
+        <!-- One Page, Animated-HeadLin -->
+        <script src="{{ url_for('static', filename='assets/js/wow.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='assets/js/animated.headline.js') }}"></script>
+        <script src="{{ url_for('static', filename='assets/js/jquery.magnific-popup.js') }}"></script>
+        <!-- Scroll Up -->
+        <script>
+            document.querySelector('.btn.radius-btn').addEventListener('click', function(e) {
+                e.preventDefault();
+                document.getElementById('check').scrollIntoView({ behavior: 'smooth' });
+            });
+            window.onscroll = function() {scrollFunction()};
+
+        function scrollFunction() {
+            if (document.body.scrollTop > 80 || document.documentElement.scrollTop > 80) {
+                document.querySelector(".header-area").classList.add("sticky-nav");
+            } else {
+                document.querySelector(".header-area").classList.remove("sticky-nav");
+            }
+        }
+        </script>
+    </body>
+</html>
+
